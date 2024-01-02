@@ -1,0 +1,173 @@
+version: "3"
+name: testdbcluster
+services:
+
+# Shard Server
+  mydb_dbs_a:
+    image: mongo:5.0.22
+    command: mongos --port 27017 --configdb mydb-rsc/mydb_dbc_a:27017,mydb_dbc_b:27017,mydb_dbc_c:27017 --bind_ip_all
+    ports:
+      - "27117:27017"
+    networks:
+      - testDBCluster
+      - mydb
+    mem_limit: 1g
+    volumes: 
+      - ./scripts:/scripts
+  mydb_dbs_b:
+    image: mongo:5.0.22
+    command: mongos --port 27017 --configdb mydb-rsc/mydb_dbc_a:27017,mydb_dbc_b:27017,mydb_dbc_c:27017 --bind_ip_all
+    ports:
+      - "27217:27017"
+    networks:
+      - testDBCluster
+      - mydb
+    mem_limit: 1g
+    volumes: 
+      - ./scripts:/scripts
+  mydb_dbs_c:
+    image: mongo:5.0.22
+    command: mongos --port 27017 --configdb mydb-rsc/mydb_dbc_a:27017,mydb_dbc_b:27017,mydb_dbc_c:27017 --bind_ip_all
+    ports:
+      - "27317:27017"
+    networks:
+      - testDBCluster
+      - mydb
+    mem_limit: 1g
+    volumes: 
+      - ./scripts:/scripts
+
+# Config Server
+  mydb_dbc_a:
+    image: mongo:5.0.22
+    command: mongod --port 27017 --configsvr --replSet mydb-rsc --wiredTigerCacheSizeGB 1
+    networks:
+      - testDBCluster
+    mem_limit: 1g
+    volumes: 
+      - ./scripts:/scripts
+      - mydb_dbc_a:/data/configdb
+  mydb_dbc_b:
+    image: mongo:5.0.22
+    command: mongod --port 27017 --configsvr --replSet mydb-rsc --wiredTigerCacheSizeGB 1
+    networks:
+      - testDBCluster
+    mem_limit: 1g
+    volumes: 
+      - ./scripts:/scripts
+      - mydb_dbc_b:/data/configdb
+  mydb_dbc_c:
+    image: mongo:5.0.22
+    command: mongod --port 27017 --configsvr --replSet mydb-rsc --wiredTigerCacheSizeGB 1
+    networks:
+      - testDBCluster
+    mem_limit: 1g
+    volumes: 
+      - ./scripts:/scripts
+      - mydb_dbc_c:/data/configdb
+
+# Shard 0
+  mydb_db0_a:
+    image: mongo:5.0.22
+    command: mongod --port 27017 --shardsvr --replSet mydb-rs0 --wiredTigerCacheSizeGB 8
+    networks:
+      - testDBCluster
+    mem_limit: 2g
+    volumes: 
+      - ./scripts:/scripts
+      - mydb_db0_a:/data/db
+  mydb_db0_b:
+    image: mongo:5.0.14
+    command: mongod --port 27017 --shardsvr --replSet mydb-rs0  --wiredTigerCacheSizeGB 8
+    networks:
+      - testDBCluster
+    mem_limit: 2g
+    volumes: 
+      - ./scripts:/scripts
+      - mydb_db0_b:/data/db
+  mydb_db0_c:
+    image: mongo:5.0.22
+    command: mongod --port 27017 --shardsvr --replSet mydb-rs0  --wiredTigerCacheSizeGB 8
+    networks:
+      - testDBCluster
+    mem_limit: 2g
+    volumes: 
+      - ./scripts:/scripts
+      - mydb_db0_c:/data/db
+
+# Shard 1
+  mydb_db1_a:
+    image: mongo:5.0.22
+    command: mongod --port 27017 --shardsvr --replSet mydb-rs1 --wiredTigerCacheSizeGB 8
+    networks:
+      - testDBCluster
+    mem_limit: 2g
+    volumes: 
+      - ./scripts:/scripts
+      - mydb_db1_a:/data/db
+  mydb_db1_b:
+    image: mongo:5.0.22
+    command: mongod --port 27017 --shardsvr --replSet mydb-rs1 --wiredTigerCacheSizeGB 8
+    networks:
+      - testDBCluster
+    mem_limit: 2g
+    volumes: 
+      - ./scripts:/scripts
+      - mydb_db1_b:/data/db
+  mydb_db1_c:
+    image: mongo:5.0.22
+    command: mongod --port 27017 --shardsvr --replSet mydb-rs1 --wiredTigerCacheSizeGB 8
+    networks:
+      - testDBCluster
+    mem_limit: 2g
+    volumes: 
+      - ./scripts:/scripts
+      - mydb_db1_c:/data/db
+
+# Shard 2
+  mydb_db2_a:
+    image: mongo:5.0.22
+    command: mongod --port 27017 --shardsvr --replSet mydb-rs2 --wiredTigerCacheSizeGB 8
+    networks:
+      - testDBCluster
+    mem_limit: 2g
+    volumes: 
+      - ./scripts:/scripts
+      - mydb_db2_a:/data/db
+  mydb_db2_b:
+    image: mongo:5.0.22
+    command: mongod --port 27017 --shardsvr --replSet mydb-rs2 --wiredTigerCacheSizeGB 8
+    networks:
+      - testDBCluster
+    mem_limit: 2g
+    volumes: 
+      - ./scripts:/scripts
+      - mydb_db2_b:/data/db
+  mydb_db2_c:
+    image: mongo:5.0.22
+    command: mongod --port 27017 --shardsvr --replSet mydb-rs2 --wiredTigerCacheSizeGB 8
+    networks:
+      - testDBCluster
+    mem_limit: 2g
+    volumes: 
+      - ./scripts:/scripts
+      - mydb_db2_c:/data/db
+volumes:
+  mydb_dbc_a:
+  mydb_dbc_b:
+  mydb_dbc_c:
+  mydb_db0_a:
+  mydb_db0_b:
+  mydb_db0_c:
+  mydb_db1_a:
+  mydb_db1_b:
+  mydb_db1_c:
+  mydb_db2_a:
+  mydb_db2_b:
+  mydb_db2_c:
+networks:
+  testDBCluster:
+    driver: bridge
+  mydb:
+    name: mydb
+    external: true
